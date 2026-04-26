@@ -1,32 +1,19 @@
 package com.ws101.cantong.EcommerceApi.model;
 
-import java.math.BigDecimal;
-import jakarta.validation.constraints.*;
-
-@NotBlank(message = "Product name is required")
-private String name;
-
-@NotNull(message = "Price is required")
-@Positive(message = "Price must be positive")
-private BigDecimal price;
-
-@Min(value = 0, message = "Stock cannot be negative")
-private Integer stockQuantity;
 public class Product {
     private Long id;
     private String name;
     private String description;
-    private BigDecimal price;
+    private double price;
     private String category;
-    private Integer stockQuantity;
+    private int stockQuantity;
     private String imageUrl;
     
-    // Default constructor
     public Product() {
     }
     
-    // All-args constructor
-    public Product(Long id, String name, String description, BigDecimal price, String category, Integer stockQuantity, String imageUrl) {
+    public Product(Long id, String name, String description, double price, 
+                   String category, int stockQuantity, String imageUrl) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -36,7 +23,6 @@ public class Product {
         this.imageUrl = imageUrl;
     }
     
-    // Getters
     public Long getId() {
         return id;
     }
@@ -49,7 +35,7 @@ public class Product {
         return description;
     }
     
-    public BigDecimal getPrice() {
+    public double getPrice() {
         return price;
     }
     
@@ -57,7 +43,7 @@ public class Product {
         return category;
     }
     
-    public Integer getStockQuantity() {
+    public int getStockQuantity() {
         return stockQuantity;
     }
     
@@ -78,7 +64,7 @@ public class Product {
         this.description = description;
     }
     
-    public void setPrice(BigDecimal price) {
+    public void setPrice(double price) {
         this.price = price;
     }
     
@@ -86,23 +72,11 @@ public class Product {
         this.category = category;
     }
     
-    public void setStockQuantity(Integer stockQuantity) {
+    public void setStockQuantity(int stockQuantity) {
         this.stockQuantity = stockQuantity;
     }
     
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
-    }
-    
-    // toString method
-    @Override
-    public String toString() {
-        return "Product{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", price=" + price +
-                ", category='" + category + '\'' +
-                ", stockQuantity=" + stockQuantity +
-                '}';
     }
 }

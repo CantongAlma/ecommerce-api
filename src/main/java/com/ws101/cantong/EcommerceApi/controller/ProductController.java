@@ -20,11 +20,7 @@ public class ProductController {
     
     @GetMapping("/{id}")
     public Product getProductById(@PathVariable Long id) {
-        Product product = productService.getProductById(id);
-        if (product == null) {
-            throw new RuntimeException("Product not found with id: " + id);
-        }
-        return product;
+        return productService.getProductById(id);
     }
     
     @PostMapping
@@ -32,28 +28,29 @@ public class ProductController {
         return productService.createProduct(product);
     }
     
-    @GetMapping("/category/{category}")
-    public List<Product> getByCategory(@PathVariable String category) {
-        return productService.getProductsByCategory(category);
+    @PutMapping("/{id}")
+    public Product updateProduct(@PathVariable Long id, @RequestBody Product product) {
+        return productService.updateProduct(id, product);
     }
     
-    @GetMapping("/count")
-    public String getCount() {
-        return "Total products: " + productService.getTotalProductCount();
+    @DeleteMapping("/{id}")
+    public String deleteProduct(@PathVariable Long id) {
+        boolean deleted = productService.deleteProduct(id);
+        return deleted ? "Product deleted" : "Product not found";
+    }
+    
+    @GetMapping("/category/{category}")
+    public List<Product> filterByCategory(@PathVariable String category) {
+        return productService.filterByCategory(category);
+    }
+    
+    @GetMapping("/price-range")
+    public List<Product> filterByPriceRange(@RequestParam double min, @RequestParam double max) {
+        return productService.filterByPriceRange(min, max);
     }
     
     @GetMapping("/search")
-    public List<Product> searchProducts(@RequestParam String keyword) {
-        return productService.searchProductsByName(keyword);
-    }
-
-    @GetMapping("/price/under/{maxPrice}")
-    public List<Product> getProductsUnderPrice(@PathVariable BigDecimal maxPrice) {
-        return productService.getProductsByMaxPrice(maxPrice);
-    }
-
-    @PutMapping("/{id}/stock")
-    public Product updateStock(@PathVariable Long id, @RequestParam int quantity) {
-        return productService.updateStock(id, quantity);
+    public List<Product> searchByName(@RequestParam String keyword) {
+        return productService.searchByName(keyword);
     }
 }
