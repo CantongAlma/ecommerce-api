@@ -7,14 +7,15 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Service class for managing Product data and business logic.
+ * Service class for product-related operations.
  * 
- * STORAGE STRATEGY:
- * - Data is stored temporarily in memory using an ArrayList<Product>.
- * - All data will be lost when the application stops or restarts.
- * - Unique IDs are generated automatically using a counter variable 'nextId'.
- * - IDs are sequential and guaranteed to be unique even if items are deleted.
- * - Initialized with 10 sample products when application starts.
+ * Provides business logic for creating, retrieving, updating, deleting, 
+ * filtering and searching products. This class acts as an intermediary 
+ * between the API controller and the data storage.
+ * Data is stored temporarily in memory and will be cleared when application restarts.
+ * 
+ * @author Alma Cantong
+ * @see Product
  */
 @Service
 public class ProductService {
@@ -23,20 +24,19 @@ public class ProductService {
     
     /**
      * Constructor: Initializes storage list and loads initial sample data.
-     * ID counter starts from 1.
+     * Starts ID generation from 1.
      */
     public ProductService() {
         products = new ArrayList<>();
-        nextId = 1L; // Start counting from 1
+        nextId = 1L;
         loadSampleData();
     }
     
     /**
      * Loads 10 predefined sample products into the system.
-     * Used for testing and demonstration purposes.
+     * Used for initial testing and demonstration purposes.
      */
     private void loadSampleData() {
-        // When adding sample data, we use the counter and increment it
         addSampleProduct(new Product(nextId++, "Wireless Headphones", "Noise cancelling over-ear headphones", 59.99, "Electronics", 15, "url1.jpg"));
         addSampleProduct(new Product(nextId++, "Mechanical Keyboard", "RGB backlit gaming keyboard", 24.99, "Electronics", 20, "url2.jpg"));
         addSampleProduct(new Product(nextId++, "Cotton T-Shirt", "Comfortable plain cotton t-shirt", 3.99, "Clothing", 50, "url3.jpg"));
@@ -50,7 +50,7 @@ public class ProductService {
     }
     
     /**
-     * Helper method to add sample products to the list.
+     * Helper method to add sample products to the storage list.
      * 
      * @param p Product object to be added
      */
@@ -59,33 +59,33 @@ public class ProductService {
     }
     
     /**
-     * Creates and saves a new product to storage.
-     * Automatically assigns a unique ID to the product.
+     * Creates and saves a new product.
+     * Automatically assigns a unique ID to the product before saving.
      * 
-     * @param product The product data to be created
-     * @return The created product with generated ID
+     * @param product The product details to be created
+     * @return The saved product including its generated unique ID
      */
     public Product createProduct(Product product) {
         product.setId(nextId);
         products.add(product);
-        nextId++; // FIXED: Added this line to increment the counter
+        nextId++;
         return product;
     }
     
     /**
      * Retrieves all existing products from storage.
      * 
-     * @return List containing all product objects
+     * @return List containing all available products. Returns empty list if no products exist.
      */
     public List<Product> getAllProducts() {
         return new ArrayList<>(products);
     }
     
     /**
-     * Finds a specific product using its ID.
+     * Finds a product using its unique ID.
      * 
-     * @param id The unique identifier of the required product
-     * @return Product object if found, null if ID does not exist
+     * @param id The unique identifier of the product to find
+     * @return Product object if found, returns null if no product matches the given ID
      */
     public Product getProductById(Long id) {
         return products.stream()
@@ -96,11 +96,11 @@ public class ProductService {
     
     /**
      * Updates information of an existing product.
-     * Keeps the original ID while updating all other details.
+     * Retains the original product ID while updating all other details.
      * 
-     * @param id ID of the product to update
+     * @param id The ID of the product to update
      * @param updatedProduct Object containing new product data
-     * @return Updated product object, null if product not found
+     * @return Updated product object, returns null if product with given ID does not exist
      */
     public Product updateProduct(Long id, Product updatedProduct) {
         for (int i = 0; i < products.size(); i++) {
@@ -115,21 +115,24 @@ public class ProductService {
     }
     
     /**
-     * Deletes a product from the storage using its ID.
+     * Deletes a product from storage using its ID.
      * 
-     * @param id ID of the product to be removed
-     * @return true if deleted successfully, false if product not found
+     * @param id The ID of the product to remove
+     * @return true if deletion is successful, false if product with given ID is not found
      */
     public boolean deleteProduct(Long id) {
         return products.removeIf(p -> p.getId().equals(id));
     }
     
     /**
-     * Filters products by matching exact category name.
+     * Filters products by matching category name.
      * Search is case-insensitive.
      * 
-     * @param category Category name to filter
-     * @return List of products belonging to specified category
+     * @param category The category name to use as filter criteria
+     * @return List of products belonging to the specified category.
+     * Returns empty list if no products match or category does not exist.
+     * @see #filterByPriceRange(double, double)
+     * @see #searchByName(String)
      */
     public List<Product> filterByCategory(String category) {
         return products.stream()
@@ -139,12 +142,20 @@ public class ProductService {
     
     /**
      * Filters products within the given price range.
+     * Includes products with price equal to minimum or maximum value.
      * 
-     * @param minPrice Minimum price limit
-     * @param maxPrice Maximum price limit
-     * @return List of products whose price is between min and max value
+     * @param minPrice The minimum price limit, must be non-negative
+     * @param maxPrice The maximum price limit, must be greater than or equal to minPrice
+     * @return List of products whose price falls between the specified range.
+     * Returns empty list if no products match the criteria.
+     * @throws IllegalArgumentException if minPrice is negative, maxPrice is negative,
+     * or minPrice value is higher than maxPrice value
+     * @see #filterByCategory(String)
      */
     public List<Product> filterByPriceRange(double minPrice, double maxPrice) {
+        if (minPrice < 0 || maxPrice < 0 || minPrice > maxPrice) {
+            throw new IllegalArgumentException("Price values are invalid. Min and Max must be non-negative and min <= max.");
+        }
         return products.stream()
                 .filter(p -> p.getPrice() >= minPrice && p.getPrice() <= maxPrice)
                 .collect(Collectors.toList());
@@ -152,10 +163,11 @@ public class ProductService {
     
     /**
      * Searches products by matching keyword in product name.
-     * Search is case-insensitive and works with partial text.
+     * Supports partial text matching and is case-insensitive.
      * 
-     * @param keyword Text to search in product name
-     * @return List of products with matching name
+     * @param keyword The text to search within product names
+     * @return List of products whose name contains the given keyword.
+     * Returns empty list if no matching product is found.
      */
     public List<Product> searchByName(String keyword) {
         return products.stream()

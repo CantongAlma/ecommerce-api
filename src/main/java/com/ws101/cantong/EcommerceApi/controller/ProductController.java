@@ -11,15 +11,15 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * REST Controller for handling all Product-related API requests.
+ * REST Controller for handling all product-related API requests.
  * 
- * STATUS CODE USAGE:
- * 200 OK          - Successful GET requests or updates.
- * 201 Created     - Successfully created a new resource (POST).
- * 204 No Content  - Successfully deleted, nothing to return.
- * 400 Bad Request - Invalid input data or parameters.
- * 404 Not Found   - Resource ID does not exist.
- * 500 Internal Server Error - Server-side failure.
+ * Acts as entry point for client requests, manages HTTP requests and responses,
+ * and communicates with service layer to process business logic.
+ * Provides endpoints for CRUD operations, filtering and partial updates.
+ * 
+ * @author Alma Cantong
+ * @see ProductService
+ * @see Product
  */
 @RestController
 @RequestMapping("/api/products")
@@ -28,16 +28,16 @@ public class ProductController {
     private final ProductService productService;
 
     /**
-     * Constructor for injecting ProductService dependency.
+     * Constructor to inject required dependency.
      * 
-     * @param productService Service class that contains business logic
+     * @param productService Service component containing product business logic
      */
     public ProductController(ProductService productService) {
         this.productService = productService;
     }
 
     /**
-     * Retrieves the list of all available products.
+     * Retrieves complete list of all available products.
      * 
      * @return ResponseEntity containing list of all products and HTTP 200 OK status
      */
@@ -48,11 +48,11 @@ public class ProductController {
     }
 
     /**
-     * Retrieves a single product using its unique ID.
+     * Retrieves specific product using its unique identifier.
      * 
-     * @param id Unique identifier of the required product
-     * @return ResponseEntity containing product data and HTTP 200 OK status
-     * @throws ProductNotFoundException if no product exists with the given ID
+     * @param id Unique ID of the product to retrieve
+     * @return ResponseEntity containing found product data and HTTP 200 OK status
+     * @throws ProductNotFoundException if no product exists with the provided ID
      */
     @GetMapping("/{id}")
     public ResponseEntity<Product> getProductById(@PathVariable Long id) {
@@ -64,13 +64,16 @@ public class ProductController {
     }
 
     /**
-     * Filters products based on given criteria.
-     * Supports filtering by category, name or price range.
+     * Filters products based on selected criteria.
+     * Supports filtering by category, name keyword or price range.
      * 
-     * @param filterType Type of filter: "category", "name" or "price"
-     * @param filterValue Value to use for filtering, for price use format: min,max
+     * @param filterType Type of filter to apply: "category", "name" or "price"
+     * @param filterValue Value to use for matching criteria. For price use format: min,max
      * @return ResponseEntity containing list of matching products and HTTP 200 OK status
-     * @throws IllegalArgumentException if filter type or value format is invalid
+     * @throws IllegalArgumentException if filter type is invalid or price format is incorrect
+     * @see ProductService#filterByCategory(String)
+     * @see ProductService#filterByPriceRange(double, double)
+     * @see ProductService#searchByName(String)
      */
     @GetMapping("/filter")
     public ResponseEntity<List<Product>> filterProducts(
@@ -103,12 +106,12 @@ public class ProductController {
     }
 
     /**
-     * Creates and saves a new product.
-     * Input data is validated before saving.
+     * Creates and saves a new product record.
+     * Input data is validated before processing.
      * 
-     * @param product Validated product data from request body
-     * @return ResponseEntity containing created product and HTTP 201 Created status
-     * @throws IllegalArgumentException if product name is empty
+     * @param product Validated product data received from request body
+     * @return ResponseEntity containing created product data and HTTP 201 Created status
+     * @throws IllegalArgumentException if product name is empty or blank
      */
     @PostMapping
     public ResponseEntity<Product> createProduct(@Valid @RequestBody Product product) {
@@ -121,11 +124,11 @@ public class ProductController {
 
     /**
      * Updates all details of an existing product.
-     * Input data is validated before updating.
+     * Requires complete product data and validates input before saving.
      * 
-     * @param id ID of the product to update
-     * @param product Validated new product data
-     * @return ResponseEntity containing updated product and HTTP 200 OK status
+     * @param id Unique ID of the product to update
+     * @param product Complete updated product information
+     * @return ResponseEntity containing updated product data and HTTP 200 OK status
      * @throws ProductNotFoundException if product with given ID does not exist
      */
     @PutMapping("/{id}")
@@ -142,11 +145,11 @@ public class ProductController {
 
     /**
      * Updates only specific fields of an existing product.
-     * Only provided fields will be updated.
+     * Only provided fields will be changed, remaining data stays the same.
      * 
-     * @param id ID of the product to update
-     * @param updates Map containing field names and new values
-     * @return ResponseEntity containing updated product and HTTP 200 OK status
+     * @param id Unique ID of the product to update
+     * @param updates Map containing field names and their new values
+     * @return ResponseEntity containing updated product data and HTTP 200 OK status
      * @throws ProductNotFoundException if product with given ID does not exist
      */
     @PatchMapping("/{id}")
@@ -177,9 +180,9 @@ public class ProductController {
     }
 
     /**
-     * Deletes a product from the system.
+     * Deletes product record from the system.
      * 
-     * @param id ID of the product to delete
+     * @param id Unique ID of the product to remove
      * @return ResponseEntity with HTTP 204 No Content status after successful deletion
      * @throws ProductNotFoundException if product with given ID does not exist
      */
