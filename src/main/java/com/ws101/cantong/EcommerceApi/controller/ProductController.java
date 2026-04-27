@@ -6,7 +6,7 @@ import com.ws101.cantong.EcommerceApi.exception.ProductNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Map;
 /**
@@ -77,7 +77,7 @@ public class ProductController {
     }
 
     @PostMapping
-    public ResponseEntity<Product> createProduct(@RequestBody Product product) {
+    public ResponseEntity<Product> createProduct(@Valid@RequestBody Product product) {
         if (product.getName() == null || product.getName().trim().isEmpty()) {
             throw new IllegalArgumentException("Product name cannot be empty.");
         }
@@ -88,7 +88,7 @@ public class ProductController {
     @PutMapping("/{id}")
     public ResponseEntity<Product> updateProduct(
             @PathVariable Long id,
-            @RequestBody Product product) {
+            @Valid@RequestBody Product product) {
 
         Product updated = productService.updateProduct(id, product);
         if (updated == null) {
@@ -100,7 +100,7 @@ public class ProductController {
     @PatchMapping("/{id}")
     public ResponseEntity<Product> partialUpdateProduct(
             @PathVariable Long id,
-            @RequestBody Map<String, Object> updates) {
+            @Valid@RequestBody Map<String, Object> updates) {
 
         Product existing = productService.getProductById(id);
         if (existing == null) {
