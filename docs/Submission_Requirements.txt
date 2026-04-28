@@ -1,4 +1,4 @@
-=
+
                 SUBMISSION REQUIREMENTS
 
 
@@ -6,7 +6,6 @@
 Project Name: E-Commerce API Development
 Repository Link: https://github.com/CantongAlma/ecommerce-api.git
 Branch Used: main
-
 
 
  1. GITHUB REPOSITORY
@@ -53,13 +52,11 @@ Desktop.ini
  3. MEANINGFUL COMMIT HISTORY
 All commits are made with clear and descriptive messages showing development progress:
 
-1. 🔨 Initial commit: Project setup, folder structure and base configuration added
-2. 📦 Add Product model class with attributes and validation rules
-3. ⚙️ Add ProductService class with complete CRUD operations and business logic
-4. 🚀 Add ProductController class with all REST API endpoints
-5. 📝 Task 7.2: Added complete Javadoc documentation for all classes and public methods
-6. 🔄 Task 7.3: Merged feature branch into main and cleaned up repository
-7. 📚 Add documentation folder and submission requirements
-8. ✅ Final update: Verified all requirements and ready for submission
-
-
+1.  Initial commit: Project setup, folder structure and base configuration added
+2.  Add Product model class with attributes and validation rules
+3.  Add ProductService class with complete CRUD operations and business logic
+4.  Add ProductController class with all REST API endpoints
+5.  Task 7.2: Added complete Javadoc documentation for all classes and public methods
+6.  Task 7.3: Merged feature branch into main and cleaned up repository
+7.  Add documentation folder and submission requirements
+8.  Final update: Verified all requirements and ready for submission

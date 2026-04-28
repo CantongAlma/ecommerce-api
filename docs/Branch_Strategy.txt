@@ -1,0 +1,35 @@
+  BRANCH STRATEGY
+
+
+ STANDARDS USED
+We followed standard naming convention and workflow to organize development work properly:
+
+ NAMING CONVENTION
+- feature/ → Used for new functions, modules or major updates
+- fix/ → Used for fixing bugs or errors
+- refactor/ → Used for improving existing code structure without changing features
+
+
+
+ BRANCHES CREATED AND USED
+
+| BRANCH NAME               | PURPOSE / TASK DESCRIPTION                          |
+|---------------------------|-----------------------------------------------------|
+| feature/project-setup     | Initialize project, add dependencies and structure  |
+| feature/product-model     | Create Product class with attributes and validation |
+| feature/product-service   | Implement business logic and CRUD operations        |
+| feature/api-endpoints     | Create REST API routes and controller class         |
+| feature/product-filtering | Add search, filter and sorting functions            |
+| feature/code-documentation | Add Javadoc comments and documentations            |
+| main                      | Final stable branch, contains all completed work    |
+
+
+
+ WORKFLOW PROCESS
+1. Created separate branch for every major task
+2. Developed and tested codes inside each feature branch
+3. Verified all features are working correctly
+4. Performed code review and checked for errors
+5. Merged approved feature branches into main branch
+6. Deleted unused feature branches after merge
+7. Only stable and tested code is available in main branch

@@ -1,0 +1,62 @@
+ CODE COMMENTS
+
+
+ STANDARDS FOLLOWED
+All codes are properly commented following the requirements below:
+  Javadoc comments added for every public class, method and interface
+  Included @param, @return, @throws, @author and @see tags
+  Added inline comments only for complex logic
+  Avoided obvious comments to keep code clean
+
+
+
+ 1. JAVADOC FOR CLASSES
+Format:
+/**
+* [Description of what the class does and its purpose]
+* 
+* @author [Your Full Name]
+* @see [Related Class Name]
+*/
+
+Example:
+/**
+ * Service class for product-related operations.
+ * Provides business logic and acts as bridge between controller and data.
+ * 
+ * @author [Your Full Name]
+ * @see Product
+ */
+public class ProductService {
+
+ 2. JAVADOC FOR PUBLIC METHODS
+Format:
+/**
+* [Description of what the method does]
+* 
+* @param   [name]    [description of input value and rules]
+* @return            [description of returned data]
+* @throws  [type]    [description when error occurs]
+* @see               [link to related method]
+*/
+
+Example:
+/**
+ * Filters products within given price range, includes min and max values.
+ * 
+ * @param minPrice Minimum price limit, must be zero or positive
+ * @param maxPrice Maximum price limit, must be equal or higher than min
+ * @return List of products matching price range, empty list if none found
+ * @throws IllegalArgumentException if price values are invalid
+ * @see #filterByCategory(String)
+ */
+public List<Product> filterByPriceRange(double minPrice, double maxPrice) {
+
+ 3. INLINE COMMENTS
+Added only when logic is not simple or needs explanation:
+```java
+// Convert input keyword to lowercase to make search case-insensitive
+.filter(p -> p.getName().toLowerCase().contains(keyword.toLowerCase()))
+
+// Keep existing ID while updating other product details
+updatedProduct.setId(id);

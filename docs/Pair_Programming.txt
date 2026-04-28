@@ -1,0 +1,29 @@
+
+
+                  PAIR PROGRAMMING
+
+
+ REQUIREMENTS COMPLIED
+  Both members actively participated and contributed to the development
+  Work was shared equally in designing, coding, testing and reviewing
+  Commit history clearly shows contributions from both contributors
+  Used standard format to document pairing sessions
+
+
+
+ WORKFLOW & CONTRIBUTION
+We followed pair programming approach throughout the project:
+- *Driver*: Wrote the actual code based on agreed logic and design
+- *Navigator*: Reviewed code in real‑time, checked logic, suggested improvements and identified possible issues
+- Roles were swapped regularly to ensure both gained hands‑on experience
+- All major features and changes were discussed and agreed by both members before implementation
+- All codes were reviewed by both contributors before merging
+
+
+
+AREAS OF CONTRIBUTION
+| Contributor               | Tasks Handled & Contribution                              |
+|---------------------------|-----------------------------------------------------------|
+| [Cantong, Alma A.]        | Project setup, Model creation, Validation, Documentation  |
+| [Marino, Mary Ann]        | Business logic, API development, Testing, Bug fixes       |
+

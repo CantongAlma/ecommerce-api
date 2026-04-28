@@ -1,0 +1,30 @@
+ CODE QUALITY
+
+
+ STANDARDS FOLLOWED
+All code is written following standard Java coding conventions and best practices.
+
+
+
+ 1. JAVA NAMING CONVENTIONS
+| Element Type       | Rule Applied                                  | Example Used                                  |
+|---------------------|-----------------------------------------------|-----------------------------------------------|
+| Classes/Interfaces  | PascalCase – First letter of each word capitalized | Product, ProductService, ProductController |
+| Methods             | camelCase – Starts with lowercase, next words capitalized | getAllProducts(), filterByPriceRange() |
+| Variables/Fields    | camelCase – Short but meaningful names        | productList, minPrice, nextId          |
+| Constants           | UPPER_SNAKE_CASE – All caps, separated by underscore | MIN_ALLOWED_PRICE, DEFAULT_ID_START      |
+| Packages            | Lowercase letters only                        | com.ecommerceapi.model, com.ecommerceapi.service |
+
+ Avoided vague names like: data, obj, doWork()
+
+--------------------------------------------------
+
+ 2. AVOID MAGIC NUMBERS AND STRINGS
+ GOOD PRACTICE:
+```java
+private static final int MIN_ALLOWED_PRICE = 0;
+private static final String CATEGORY_ELECTRONICS = "Electronics";
+
+if (price < MIN_ALLOWED_PRICE) {
+    throw new IllegalArgumentException("Price cannot be negative");
+}

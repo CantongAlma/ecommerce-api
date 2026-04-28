@@ -1,0 +1,29 @@
+COMMIT MESSAGES
+
+
+ STANDARD FORMAT USED
+Format: <type>: <short description of what was done>
+  feat: → For adding new functions/features
+  fix: → For correcting errors or bugs
+  refactor: → For improving code structure
+  docs: → For adding or updating documentation
+  chore: → For setup, configuration and other changes
+
+
+
+ COMMIT HISTORY USED IN THIS PROJECT
+
+feat: initialized project structure and dependencies
+feat: added Product model with validation rules
+feat: implemented CRUD operations in ProductService
+feat: created all API endpoints in ProductController
+feat: added product filtering by category and price
+feat: added product search by name keyword
+docs: added complete Javadoc comments to all classes
+docs: added submission requirements and documentation
+docs: added branch strategy documentation
+docs: added pair programming and code quality docs
+refactor: improved code organization and readability
+chore: added .gitignore file to exclude unnecessary files
+chore: merged all feature branches into main branch
+fix: corrected null value issue in getProductById method
