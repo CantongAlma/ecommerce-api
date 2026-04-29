@@ -155,7 +155,8 @@ public class ProductController {
     @PatchMapping("/{id}")
     public ResponseEntity<Product> partialUpdateProduct(
             @PathVariable Long id,
-            @Valid @RequestBody Map<String, Object> updates) {
+            @RequestBody Map<String, Object> updates) {
+            
 
         Product existing = productService.getProductById(id);
         if (existing == null) {

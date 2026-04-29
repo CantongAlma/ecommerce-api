@@ -1,6 +1,5 @@
 package com.ws101.cantong.EcommerceApi.response;
 
-import com.ws101.cantong.EcommerceApi.response.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
