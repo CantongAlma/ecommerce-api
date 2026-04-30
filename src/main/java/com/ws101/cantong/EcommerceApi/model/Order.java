@@ -79,7 +79,7 @@ public class Order {
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
     
-    @Column(name = "total_amount", precision = 10, scale = 2)
+    @Column(name = "total_amount")
     private Double totalAmount;
     
     /**

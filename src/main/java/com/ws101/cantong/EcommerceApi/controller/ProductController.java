@@ -7,19 +7,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
 /**
- * REST Controller for handling all product-related API requests.
- * 
- * Acts as entry point for client requests, manages HTTP requests and responses,
- * and communicates with service layer to process business logic.
- * Provides endpoints for CRUD operations, filtering and partial updates.
+ * REST Controller for managing Product operations.
+ * Provides endpoints for CRUD operations, filtering, and searching products.
  * 
  * @author Alma Cantong
- * @see ProductService
- * @see Product
+ * @version 1.0
  */
 @RestController
 @RequestMapping("/api/products")
@@ -28,18 +25,18 @@ public class ProductController {
     private final ProductService productService;
 
     /**
-     * Constructor to inject required dependency.
+     * Constructor injection of ProductService.
      * 
-     * @param productService Service component containing product business logic
+     * @param productService the product service to be injected
      */
     public ProductController(ProductService productService) {
         this.productService = productService;
     }
 
     /**
-     * Retrieves complete list of all available products.
+     * Retrieves all products.
      * 
-     * @return ResponseEntity containing list of all products and HTTP 200 OK status
+     * @return ResponseEntity containing list of all products with HTTP 200 OK status
      */
     @GetMapping
     public ResponseEntity<List<Product>> getAllProducts() {
@@ -48,32 +45,26 @@ public class ProductController {
     }
 
     /**
-     * Retrieves specific product using its unique identifier.
+     * Retrieves a product by its ID.
      * 
-     * @param id Unique ID of the product to retrieve
-     * @return ResponseEntity containing found product data and HTTP 200 OK status
-     * @throws ProductNotFoundException if no product exists with the provided ID
+     * @param id the product ID
+     * @return ResponseEntity containing the product with HTTP 200 OK status
+     * @throws ProductNotFoundException if product with given ID is not found
      */
     @GetMapping("/{id}")
     public ResponseEntity<Product> getProductById(@PathVariable Long id) {
         Product product = productService.getProductById(id);
-        if (product == null) {
-            throw new ProductNotFoundException("Product with ID " + id + " not found.");
-        }
         return new ResponseEntity<>(product, HttpStatus.OK);
     }
 
     /**
-     * Filters products based on selected criteria.
-     * Supports filtering by category, name keyword or price range.
+     * Filters products based on filter type and value.
+     * Supported filter types: category, name, price
      * 
-     * @param filterType Type of filter to apply: "category", "name" or "price"
-     * @param filterValue Value to use for matching criteria. For price use format: min,max
-     * @return ResponseEntity containing list of matching products and HTTP 200 OK status
+     * @param filterType the type of filter (category, name, or price)
+     * @param filterValue the value to filter by
+     * @return ResponseEntity containing filtered list of products with HTTP 200 OK status
      * @throws IllegalArgumentException if filter type is invalid or price format is incorrect
-     * @see ProductService#filterByCategory(String)
-     * @see ProductService#filterByPriceRange(double, double)
-     * @see ProductService#searchByName(String)
      */
     @GetMapping("/filter")
     public ResponseEntity<List<Product>> filterProducts(
@@ -99,19 +90,18 @@ public class ProductController {
                 result = productService.filterByPriceRange(min, max);
                 break;
             default:
-                throw new IllegalArgumentException("Invalid filter type: " + filterType);
+                throw new IllegalArgumentException("Invalid filter type: " + filterType + ". Use: category, name, or price");
         }
 
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     /**
-     * Creates and saves a new product record.
-     * Input data is validated before processing.
+     * Creates a new product.
      * 
-     * @param product Validated product data received from request body
-     * @return ResponseEntity containing created product data and HTTP 201 Created status
-     * @throws IllegalArgumentException if product name is empty or blank
+     * @param product the product to create
+     * @return ResponseEntity containing the created product with HTTP 201 CREATED status
+     * @throws IllegalArgumentException if product name is empty
      */
     @PostMapping
     public ResponseEntity<Product> createProduct(@Valid @RequestBody Product product) {
@@ -123,13 +113,12 @@ public class ProductController {
     }
 
     /**
-     * Updates all details of an existing product.
-     * Requires complete product data and validates input before saving.
+     * Updates an existing product completely.
      * 
-     * @param id Unique ID of the product to update
-     * @param product Complete updated product information
-     * @return ResponseEntity containing updated product data and HTTP 200 OK status
-     * @throws ProductNotFoundException if product with given ID does not exist
+     * @param id the ID of the product to update
+     * @param product the updated product data
+     * @return ResponseEntity containing the updated product with HTTP 200 OK status
+     * @throws ProductNotFoundException if product with given ID is not found
      */
     @PutMapping("/{id}")
     public ResponseEntity<Product> updateProduct(
@@ -137,62 +126,88 @@ public class ProductController {
             @Valid @RequestBody Product product) {
 
         Product updated = productService.updateProduct(id, product);
-        if (updated == null) {
-            throw new ProductNotFoundException("Product with ID " + id + " not found.");
-        }
         return new ResponseEntity<>(updated, HttpStatus.OK);
     }
 
     /**
-     * Updates only specific fields of an existing product.
-     * Only provided fields will be changed, remaining data stays the same.
+     * Partially updates an existing product.
+     * Only updates fields that are provided in the request body.
      * 
-     * @param id Unique ID of the product to update
-     * @param updates Map containing field names and their new values
-     * @return ResponseEntity containing updated product data and HTTP 200 OK status
-     * @throws ProductNotFoundException if product with given ID does not exist
+     * @param id the ID of the product to update
+     * @param updates map containing the fields to update and their new values
+     * @return ResponseEntity containing the updated product with HTTP 200 OK status
+     * @throws ProductNotFoundException if product with given ID is not found
      */
     @PatchMapping("/{id}")
     public ResponseEntity<Product> partialUpdateProduct(
             @PathVariable Long id,
             @RequestBody Map<String, Object> updates) {
             
-
         Product existing = productService.getProductById(id);
-        if (existing == null) {
-            throw new ProductNotFoundException("Product with ID " + id + " not found.");
-        }
 
-        if (updates.containsKey("name"))
+        // Apply partial updates
+        if (updates.containsKey("name")) {
             existing.setName((String) updates.get("name"));
-        if (updates.containsKey("description"))
+        }
+        if (updates.containsKey("description")) {
             existing.setDescription((String) updates.get("description"));
-        if (updates.containsKey("price"))
-            existing.setPrice((Double) updates.get("price"));
-        if (updates.containsKey("category"))
-            existing.setCategory((String) updates.get("category"));
-        if (updates.containsKey("stockQuantity"))
+        }
+        if (updates.containsKey("price")) {
+            Object priceValue = updates.get("price");
+            if (priceValue instanceof Double) {
+                existing.setPrice(BigDecimal.valueOf((Double) priceValue));
+            } else if (priceValue instanceof Integer) {
+                existing.setPrice(BigDecimal.valueOf((Integer) priceValue));
+            } else if (priceValue instanceof String) {
+                existing.setPrice(new BigDecimal((String) priceValue));
+            }
+        }
+        if (updates.containsKey("stockQuantity")) {
             existing.setStockQuantity((Integer) updates.get("stockQuantity"));
-        if (updates.containsKey("imageUrl"))
+        }
+        if (updates.containsKey("imageUrl")) {
             existing.setImageUrl((String) updates.get("imageUrl"));
+        }
 
         Product saved = productService.updateProduct(id, existing);
         return new ResponseEntity<>(saved, HttpStatus.OK);
     }
 
     /**
-     * Deletes product record from the system.
+     * Deletes a product by its ID.
      * 
-     * @param id Unique ID of the product to remove
-     * @return ResponseEntity with HTTP 204 No Content status after successful deletion
-     * @throws ProductNotFoundException if product with given ID does not exist
+     * @param id the ID of the product to delete
+     * @return ResponseEntity with HTTP 204 NO CONTENT status
+     * @throws ProductNotFoundException if product with given ID is not found
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
-        boolean deleted = productService.deleteProduct(id);
-        if (!deleted) {
-            throw new ProductNotFoundException("Product with ID " + id + " not found.");
-        }
+        productService.deleteProduct(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+    
+    /**
+     * Gets products with low stock below the specified threshold.
+     * 
+     * @param threshold the stock threshold (default is 10)
+     * @return ResponseEntity containing list of low stock products
+     */
+    @GetMapping("/low-stock")
+    public ResponseEntity<List<Product>> getLowStockProducts(
+            @RequestParam(defaultValue = "10") int threshold) {
+        List<Product> products = productService.getLowStockProducts(threshold);
+        return new ResponseEntity<>(products, HttpStatus.OK);
+    }
+    
+    /**
+     * Gets products by category ID.
+     * 
+     * @param categoryId the category ID to filter by
+     * @return ResponseEntity containing list of products in the category
+     */
+    @GetMapping("/category/{categoryId}")
+    public ResponseEntity<List<Product>> getProductsByCategoryId(@PathVariable Long categoryId) {
+        List<Product> products = productService.getProductsByCategoryId(categoryId);
+        return new ResponseEntity<>(products, HttpStatus.OK);
     }
 }
