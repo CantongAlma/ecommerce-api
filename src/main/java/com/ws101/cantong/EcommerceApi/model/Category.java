@@ -63,6 +63,16 @@ public class Category {
     }
     
     /**
+     * Constructor with essential category information (name only).
+     * 
+     * @param name the category name (must be unique)
+     */
+    public Category(String name) {
+        this.name = name;
+        this.description = "";
+    }
+    
+    /**
      * Constructor with essential category information.
      * 
      * @param name the category name (must be unique)

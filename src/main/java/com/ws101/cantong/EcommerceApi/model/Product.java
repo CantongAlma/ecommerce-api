@@ -27,6 +27,7 @@ import java.util.List;
 @Table(name = "products")
 public class Product {
     
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -94,6 +95,23 @@ public class Product {
         this.name = name;
         this.description = description;
         this.price = price;
+        this.stockQuantity = stockQuantity;
+    }
+    
+    // ADD THIS CONSTRUCTOR FOR YOUR CommandLineRunner
+    /**
+     * Constructor for initial data loading with Double price.
+     * Converts Double to BigDecimal automatically.
+     * 
+     * @param name the product name
+     * @param description the product description
+     * @param price the product price as Double (will be converted to BigDecimal)
+     * @param stockQuantity the available stock quantity
+     */
+    public Product(String name, String description, Double price, Integer stockQuantity) {
+        this.name = name;
+        this.description = description;
+        this.price = BigDecimal.valueOf(price);
         this.stockQuantity = stockQuantity;
     }
     

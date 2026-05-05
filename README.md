@@ -195,3 +195,61 @@ All API endpoints return JSON data.
 * **In-Memory Storage**: All data is stored temporarily in the application's memory (`ArrayList` or similar structure). This means any changes (additions, updates, deletions) will be **lost** when the server is stopped or restarted.
 * **No Database Integration**: The API currently does not connect to any persistent database.
 * **No Authentication/Authorization**: User authentication and authorization mechanisms are not yet implemented.
+
+EcommerceApi
+
+## Database Schema
+
+This project utilizes a MySQL database named ecommercedb. The primary entity for storing product information is Product, which is mapped to the products table in the database.
+
+### products Table Structure:
+
+The products table contains the following columns:
+
+| Column Name   | Data Type         | Constraints                   | Description                                          |
+| :------------ | :---------------- | :---------------------------- | :--------------------------------------------------- |
+| id          | BIGINT          | PRIMARY KEY, AUTO_INCREMENT | A unique identifier for each product.                |
+| name        | VARCHAR(255)    | NOT NULL                    | The name of the product.                             |
+| description | VARCHAR(255)    | NULLABLE                    | A brief description of the product.                  |
+| price       | DOUBLE          | NOT NULL                    | The selling price of the product.                    |
+| category_id | INT             | NULLABLE                    | An integer representing the category of the product. |
+
+---
+
+## API Endpoints
+
+The backend Spring Boot application exposes a RESTful API endpoint to retrieve product information.
+
+### Products API
+
+-   *Endpoint:* /api/products
+-   *Method:* GET
+-   *URL:* http://localhost:8080/api/products
+-   *Description:* Retrieves a JSON array of all available products from the database.
+-   *Example Response (JSON):*
+    
+    [
+        {
+            "id": 1,
+            "name": "Wireless Headphones",
+            "description": "High quality sound",
+            "price": 19.99,
+            "categoryId": 1
+        },
+        {
+            "id": 2,
+            "name": "Smart Watch",
+            "description": "Fitness tracker",
+            "price": 29.99,
+            "categoryId": 1
+        },
+        {
+            "id": 3,
+            "name": "Shoes",
+            "description": "Comfortable sport shoes",
+            "price": 39.99,
+            "categoryId": 2
+        }
+        // ... more products
+    ]
+    
