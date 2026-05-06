@@ -1,5 +1,6 @@
 package com.ws101.cantong.EcommerceApi.model;
 
+import com.ws101.cantong.EcommerceApi.entity.User;  // ADD THIS IMPORT
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;

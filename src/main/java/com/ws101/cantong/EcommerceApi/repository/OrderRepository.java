@@ -1,8 +1,8 @@
 package com.ws101.cantong.EcommerceApi.repository;
 
+import com.ws101.cantong.EcommerceApi.entity.User;  // CHANGED: from model.User to entity.User
 import com.ws101.cantong.EcommerceApi.model.Order;
 import com.ws101.cantong.EcommerceApi.model.OrderStatus;
-import com.ws101.cantong.EcommerceApi.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import java.time.LocalDateTime;
