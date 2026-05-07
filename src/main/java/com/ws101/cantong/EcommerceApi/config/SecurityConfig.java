@@ -4,6 +4,7 @@ import com.ws101.cantong.EcommerceApi.service.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -17,7 +18,7 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity(prePostEnabled = true)
+@EnableMethodSecurity(prePostEnabled = true) 
 public class SecurityConfig {
 
     @Autowired
@@ -43,26 +44,29 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        
         http
-            // TEMPORARILY DISABLE CSRF FOR TESTING
-            .csrf(csrf -> csrf.disable())
+            .csrf(csrf -> csrf.disable())  // For testing (enable in production)
             
             .authorizeHttpRequests(authz -> authz
-                // PUBLIC ENDPOINTS
-                .requestMatchers("/", "/home", "/login", "/register").permitAll()
+                // Public endpoints - no authentication required
+                .requestMatchers("/", "/home", "/login", "/register", "/register-simple", "/test").permitAll()
                 .requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
                 .requestMatchers("/api/v1/auth/**").permitAll()
-                .requestMatchers("/api/v1/products").permitAll()
-                .requestMatchers("/api/v1/products/**").permitAll()
+                .requestMatchers("/api/v1/products").permitAll()  // GET products - public
+                .requestMatchers("/api/v1/products/**").permitAll()  // GET single product - public
                 .requestMatchers("/h2-console/**").permitAll()
                 
-                // PROTECTED ENDPOINTS
+                // Protected endpoints - authentication required (also use @PreAuthorize)
                 .requestMatchers("/api/v1/orders/**").authenticated()
                 .requestMatchers("/api/v1/cart/**").authenticated()
                 .requestMatchers("/api/v1/profile/**").authenticated()
                 
-                // ADMIN ONLY
-                .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
+                // Admin only via request matcher (as backup to @PreAuthorize)
+                .requestMatchers(HttpMethod.DELETE, "/api/v1/products/**").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.POST, "/api/v1/products").hasAnyRole("ADMIN", "SELLER")
+                .requestMatchers(HttpMethod.PUT, "/api/v1/products/**").hasAnyRole("ADMIN", "SELLER")
+                .requestMatchers(HttpMethod.PATCH, "/api/v1/products/**").hasAnyRole("ADMIN", "SELLER")
                 
                 .anyRequest().authenticated()
             )
@@ -70,7 +74,7 @@ public class SecurityConfig {
             .formLogin(form -> form
                 .loginPage("/login")
                 .loginProcessingUrl("/api/v1/auth/login")
-                .defaultSuccessUrl("/api/v1/products", true)
+                .defaultSuccessUrl("http://localhost:3000", true)
                 .failureUrl("/login?error=true")
                 .permitAll()
             )
@@ -89,7 +93,6 @@ public class SecurityConfig {
                 .expiredUrl("/login?expired=true")
             );
         
-        // Disable frame options for H2 console
         http.headers(headers -> headers.frameOptions(frame -> frame.disable()));
         
         return http.build();
