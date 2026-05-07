@@ -1,7 +1,13 @@
 package com.ws101.cantong.EcommerceApi.controller;
 
+import com.ws101.cantong.EcommerceApi.dto.CreateProductDto;
+import com.ws101.cantong.EcommerceApi.dto.ProductListingDto;
+import com.ws101.cantong.EcommerceApi.dto.UpdateProductDto;
+import com.ws101.cantong.EcommerceApi.model.Category;
 import com.ws101.cantong.EcommerceApi.model.Product;
 import com.ws101.cantong.EcommerceApi.service.ProductService;
+import com.ws101.cantong.EcommerceApi.repository.CategoryRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -10,25 +16,30 @@ import jakarta.validation.Valid;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/products")
 public class ProductController {
 
     private final ProductService productService;
+    
+    @Autowired
+    private CategoryRepository categoryRepository;
 
     public ProductController(ProductService productService) {
         this.productService = productService;
     }
 
-    // Public - anyone can view products
     @GetMapping
-    public ResponseEntity<List<Product>> getAllProducts() {
+    public ResponseEntity<List<ProductListingDto>> getAllProducts() {
         List<Product> products = productService.getAllProducts();
-        return new ResponseEntity<>(products, HttpStatus.OK);
+        List<ProductListingDto> productDTOs = products.stream()
+            .map(p -> new ProductListingDto(p.getId(), p.getName(), p.getPrice(), p.getImageUrl()))
+            .collect(Collectors.toList());
+        return new ResponseEntity<>(productDTOs, HttpStatus.OK);
     }
 
-    
     @GetMapping("/{id}")
     public ResponseEntity<Product> getProductById(@PathVariable Long id) {
         Product product = productService.getProductById(id);
@@ -59,7 +70,7 @@ public class ProductController {
                 result = productService.filterByPriceRange(min, max);
                 break;
             default:
-                throw new IllegalArgumentException("Invalid filter type: " + filterType + ". Use: category, name, or price");
+                throw new IllegalArgumentException("Invalid filter type: " + filterType);
         }
 
         return new ResponseEntity<>(result, HttpStatus.OK);
@@ -67,10 +78,25 @@ public class ProductController {
 
     @PreAuthorize("hasAnyRole('ADMIN', 'SELLER')")
     @PostMapping
-    public ResponseEntity<Product> createProduct(@Valid @RequestBody Product product) {
-        if (product.getName() == null || product.getName().trim().isEmpty()) {
-            throw new IllegalArgumentException("Product name cannot be empty.");
+    public ResponseEntity<Product> createProduct(@Valid @RequestBody CreateProductDto createDto) {
+        Product product = new Product();
+        product.setName(createDto.getName());
+        product.setDescription(createDto.getDescription());
+        product.setPrice(createDto.getPrice());
+        product.setStockQuantity(createDto.getStockQuantity());
+        product.setImageUrl(createDto.getImageUrl());
+        
+        // Set category if provided - using findByNameIgnoreCase
+        if (createDto.getCategory() != null && !createDto.getCategory().isEmpty()) {
+            Category category = categoryRepository.findByNameIgnoreCase(createDto.getCategory())
+                .orElseGet(() -> {
+                    Category newCategory = new Category();
+                    newCategory.setName(createDto.getCategory());
+                    return categoryRepository.save(newCategory);
+                });
+            product.setCategory(category);
         }
+        
         Product created = productService.createProduct(product);
         return new ResponseEntity<>(created, HttpStatus.CREATED);
     }
@@ -79,8 +105,37 @@ public class ProductController {
     @PutMapping("/{id}")
     public ResponseEntity<Product> updateProduct(
             @PathVariable Long id,
-            @Valid @RequestBody Product product) {
-        Product updated = productService.updateProduct(id, product);
+            @Valid @RequestBody UpdateProductDto updateDto) {
+        
+        Product existing = productService.getProductById(id);
+        
+        if (updateDto.getName() != null) {
+            existing.setName(updateDto.getName());
+        }
+        if (updateDto.getDescription() != null) {
+            existing.setDescription(updateDto.getDescription());
+        }
+        if (updateDto.getPrice() != null) {
+            existing.setPrice(updateDto.getPrice());
+        }
+        if (updateDto.getStockQuantity() != null) {
+            existing.setStockQuantity(updateDto.getStockQuantity());
+        }
+        if (updateDto.getImageUrl() != null) {
+            existing.setImageUrl(updateDto.getImageUrl());
+        }
+        if (updateDto.getCategory() != null && !updateDto.getCategory().isEmpty()) {
+            // Using findByNameIgnoreCase
+            Category category = categoryRepository.findByNameIgnoreCase(updateDto.getCategory())
+                .orElseGet(() -> {
+                    Category newCategory = new Category();
+                    newCategory.setName(updateDto.getCategory());
+                    return categoryRepository.save(newCategory);
+                });
+            existing.setCategory(category);
+        }
+        
+        Product updated = productService.updateProduct(id, existing);
         return new ResponseEntity<>(updated, HttpStatus.OK);
     }
 
@@ -114,12 +169,22 @@ public class ProductController {
         if (updates.containsKey("imageUrl")) {
             existing.setImageUrl((String) updates.get("imageUrl"));
         }
+        if (updates.containsKey("category")) {
+            String categoryName = (String) updates.get("category");
+            // Using findByNameIgnoreCase
+            Category category = categoryRepository.findByNameIgnoreCase(categoryName)
+                .orElseGet(() -> {
+                    Category newCategory = new Category();
+                    newCategory.setName(categoryName);
+                    return categoryRepository.save(newCategory);
+                });
+            existing.setCategory(category);
+        }
 
         Product saved = productService.updateProduct(id, existing);
         return new ResponseEntity<>(saved, HttpStatus.OK);
     }
 
-    
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
@@ -127,14 +192,12 @@ public class ProductController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
     
-    
     @GetMapping("/low-stock")
     public ResponseEntity<List<Product>> getLowStockProducts(
             @RequestParam(defaultValue = "10") int threshold) {
         List<Product> products = productService.getLowStockProducts(threshold);
         return new ResponseEntity<>(products, HttpStatus.OK);
     }
-    
     
     @GetMapping("/category/{categoryId}")
     public ResponseEntity<List<Product>> getProductsByCategoryId(@PathVariable Long categoryId) {
