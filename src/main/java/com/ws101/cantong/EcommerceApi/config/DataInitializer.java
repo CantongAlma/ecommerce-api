@@ -60,4 +60,5 @@ public class DataInitializer implements CommandLineRunner {
             System.out.println("✅ Default SELLER created: seller@ecommerce.com / seller123");
         }
     }
+    
 }

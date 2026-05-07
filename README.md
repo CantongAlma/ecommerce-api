@@ -253,3 +253,32 @@ The backend Spring Boot application exposes a RESTful API endpoint to retrieve p
         // ... more products
     ]
     
+    # Ecommerce API - Laboratory 9
+
+## Testing the Authentication Endpoints
+
+### 1. Register a new user
+```bash
+curl -X POST http://localhost:8081/api/v1/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "cantongalma487@gmail.com",
+    "password": "123456",
+    "firstName": "Alma",
+    "lastName": "Cantong",
+    "role": "USER"
+  }'
+  # Response
+  {
+  "success": true,
+  "message": "User registered successfully!",
+  "userId": 4,
+  "email": "cantongalma487@gmail.com"
+  }
+  # Login
+  curl -X POST http://localhost:8081/api/v1/auth/login \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "cantongalma487@gmail.com&password=123456" \
+  -c cookies.txt
+  # Logout
+  curl -X POST http://localhost:8081/api/v1/auth/logout -b cookies.txt

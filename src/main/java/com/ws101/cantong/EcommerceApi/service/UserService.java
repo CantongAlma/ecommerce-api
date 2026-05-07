@@ -12,35 +12,59 @@ import java.util.Set;
 
 @Service
 public class UserService {
-    
+
     @Autowired
     private UserRepository userRepository;
-    
+
     @Autowired
     private PasswordEncoder passwordEncoder;
-    
+
+    /**
+     * Register a new user with validation and password encoding
+     */
     @Transactional
     public User registerUser(String email, String password, String firstName, String lastName, String role) {
-        // Check if email already exists
+       
         if (userRepository.existsByEmail(email)) {
-            throw new RuntimeException("Email is already registered!");
+            throw new RuntimeException("Email is already registered: " + email);
         }
         
-        // Create new user
+       
+        if (password == null || password.length() < 6) {
+            throw new RuntimeException("Password must be at least 6 characters long");
+        }
+        
+    
+        if (firstName == null || firstName.trim().isEmpty()) {
+            throw new RuntimeException("First name is required");
+        }
+        
+        if (lastName == null || lastName.trim().isEmpty()) {
+            throw new RuntimeException("Last name is required");
+        }
+        
+    
         User user = new User();
         user.setEmail(email);
         user.setPassword(passwordEncoder.encode(password)); // Hash the password
         user.setFirstName(firstName);
         user.setLastName(lastName);
         
-        // Assign role (default to USER if invalid role provided)
+        
+        Role userRole;
         try {
-            Role userRole = Role.valueOf(role.toUpperCase());
-            user.setRoles(Set.of(userRole));
+            if (role != null && !role.isEmpty()) {
+                userRole = Role.valueOf(role.toUpperCase());
+            } else {
+                userRole = Role.USER;
+            }
         } catch (IllegalArgumentException e) {
-            user.setRoles(Set.of(Role.USER)); // Default to USER role
+            userRole = Role.USER; // Default to USER role
         }
         
+        user.setRoles(Set.of(userRole));
+        
+       
         user.setEnabled(true);
         user.setAccountNonExpired(true);
         user.setAccountNonLocked(true);
@@ -48,13 +72,19 @@ public class UserService {
         
         return userRepository.save(user);
     }
-    
+
+    /**
+     * Find user by email
+     */
     @Transactional(readOnly = true)
     public User findByEmail(String email) {
         return userRepository.findByEmail(email)
             .orElseThrow(() -> new RuntimeException("User not found with email: " + email));
     }
-    
+
+    /**
+     * Check if email exists
+     */
     @Transactional(readOnly = true)
     public boolean existsByEmail(String email) {
         return userRepository.existsByEmail(email);

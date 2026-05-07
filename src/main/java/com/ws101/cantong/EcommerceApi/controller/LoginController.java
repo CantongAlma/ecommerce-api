@@ -15,4 +15,12 @@ public class LoginController {
     public String register() {
         return "register";
     }
+    @GetMapping("/test")
+    public String test() {
+    return "test";
+    }
+    @GetMapping("/simple")
+    public String simple() {
+    return "simple";
+    }
 }

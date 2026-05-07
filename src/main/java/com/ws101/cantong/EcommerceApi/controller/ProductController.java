@@ -19,7 +19,7 @@ import java.util.Map;
  * @version 1.0
  */
 @RestController
-@RequestMapping("/api/products")
+@RequestMapping("/api/v1/products")  // CHANGED: from "/api/products" to "/api/v1/products"
 public class ProductController {
 
     private final ProductService productService;
