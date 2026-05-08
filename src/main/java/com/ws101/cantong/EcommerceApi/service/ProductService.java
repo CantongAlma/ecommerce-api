@@ -1,5 +1,6 @@
 package com.ws101.cantong.EcommerceApi.service;
 
+import com.ws101.cantong.EcommerceApi.exception.ResourceNotFoundException;
 import com.ws101.cantong.EcommerceApi.model.Product;
 import com.ws101.cantong.EcommerceApi.model.Category;
 import com.ws101.cantong.EcommerceApi.repository.ProductRepository;
@@ -29,7 +30,7 @@ public class ProductService {
         // Validate category if provided
         if (product.getCategory() != null && product.getCategory().getId() != null) {
             Category category = categoryRepository.findById(product.getCategory().getId())
-                .orElseThrow(() -> new RuntimeException("Category not found with id: " + product.getCategory().getId()));
+                .orElseThrow(() -> new ResourceNotFoundException("Category", product.getCategory().getId()));
             product.setCategory(category);
         }
         return productRepository.save(product);
@@ -47,7 +48,7 @@ public class ProductService {
      */
     public Product getProductById(Long id) {
         return productRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Product not found with id: " + id));
+            .orElseThrow(() -> new ResourceNotFoundException("Product", id));
     }
     
     /**
@@ -66,24 +67,19 @@ public class ProductService {
         // Update category if provided
         if (updatedProduct.getCategory() != null && updatedProduct.getCategory().getId() != null) {
             Category category = categoryRepository.findById(updatedProduct.getCategory().getId())
-                .orElseThrow(() -> new RuntimeException("Category not found with id: " + updatedProduct.getCategory().getId()));
+                .orElseThrow(() -> new ResourceNotFoundException("Category", updatedProduct.getCategory().getId()));
             existingProduct.setCategory(category);
         }
         
         return productRepository.save(existingProduct);
     }
     
-    // ❌ REMOVE THIS DUPLICATE METHOD (lines 115-117 in your original)
-    // public List<Product> getAllProducts() {
-    //     return productRepository.findAll();
-    // }
-    
     /**
      * Deletes a product from the database using its ID.
      */
     public void deleteProduct(Long id) {
         if (!productRepository.existsById(id)) {
-            throw new RuntimeException("Product not found with id: " + id);
+            throw new ResourceNotFoundException("Product", id);
         }
         productRepository.deleteById(id);
     }
@@ -93,7 +89,7 @@ public class ProductService {
      */
     public List<Product> filterByCategory(String category) {
         Category foundCategory = categoryRepository.findByNameIgnoreCase(category)
-            .orElseThrow(() -> new RuntimeException("Category not found: " + category));
+            .orElseThrow(() -> new ResourceNotFoundException("Category", "name", category));
         
         return productRepository.findByCategoryId(foundCategory.getId());
     }
