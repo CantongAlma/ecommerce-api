@@ -1,4 +1,4 @@
- Technologies & Dependencies
+Technologies & Dependencies
 
 * **Java Version**: 17 or higher
 * **Framework**: Spring Boot 3.x
@@ -43,7 +43,7 @@ Before running the application, ensure you have the following installed:
     *(For Windows users, you might use `mvnw spring-boot:run`)*
 
 4. **Access the API:**
-    The server will start on `http://localhost:8080`.
+    The server will start on `http://localhost:8081`.
 
 
 
@@ -278,7 +278,95 @@ curl -X POST http://localhost:8081/api/v1/auth/register \
   # Login
   curl -X POST http://localhost:8081/api/v1/auth/login \
   -H "Content-Type: application/x-www-form-urlencoded" \
-  -d "cantongalma487@gmail.com&password=123456" \
+  -d "cantongalma487@gmail.com&password=12345678" \
   -c cookies.txt
   # Logout
-  curl -X POST http://localhost:8081/api/v1/auth/logout -b cookies.txt
+  curl -X POST http://localhost:8081/api/v1/auth/logout -b cookies.txt this my readme.md insert the need text
+
+  # Ecommerce API - Laboratory 9
+
+## Project Overview
+This is a secure E-commerce REST API built with Spring Boot and Spring Security. It implements session-based authentication, role-based access control, input validation, and global exception handling.
+
+---
+
+## Technologies & Dependencies
+
+| Category | Technology |
+|----------|------------|
+| **Java Version** | 21 |
+| **Framework** | Spring Boot 3.2.5 |
+| **Build Tool** | Maven |
+| **Database** | MySQL |
+
+### Key Dependencies
+- `spring-boot-starter-web` – For building RESTful services
+- `spring-boot-starter-security` – For authentication and authorization
+- `spring-boot-starter-data-jpa` – For database access
+- `spring-boot-starter-validation` – For robust input validation
+- `lombok` – To reduce boilerplate code
+- `mysql-connector-j` – MySQL database driver
+
+---
+
+## Security Architecture
+
+### Session-Based Authentication
+This API uses **Session-Based Authentication** (not JWT). Here's how it works:
+
+1. User submits credentials (email/password) → `POST /api/v1/auth/login`
+2. Server validates credentials
+3. Server creates HTTP session and generates JSESSIONID cookie
+4. Server sends cookie back to client (`Set-Cookie: JSESSIONID=...`)
+5. Browser automatically includes cookie in subsequent requests
+6. Server validates cookie on each request to identify user
+
+### Role-Based Access Control (RBAC)
+
+| Role | Permissions |
+|------|-------------|
+| **ADMIN** | Full access: Create, Read, Update, Delete all products, View all orders |
+| **SELLER** | Create and update products (cannot delete) |
+| **USER** | View products, Create orders, View own orders |
+
+---
+
+## Database Schema
+
+This project utilizes a MySQL database named `ecommerce_db`. The primary entities are:
+
+### Users Table
+| Column | Type | Constraints |
+|--------|------|-------------|
+| id | BIGINT | PRIMARY KEY, AUTO_INCREMENT |
+| email | VARCHAR(100) | NOT NULL, UNIQUE |
+| password | VARCHAR(255) | NOT NULL |
+| first_name | VARCHAR(50) | NOT NULL |
+| last_name | VARCHAR(50) | NOT NULL |
+| enabled | BOOLEAN | DEFAULT TRUE |
+
+### Products Table
+| Column | Type | Constraints |
+|--------|------|-------------|
+| id | BIGINT | PRIMARY KEY, AUTO_INCREMENT |
+| name | VARCHAR(100) | NOT NULL |
+| description | VARCHAR(500) | |
+| price | DECIMAL(10,2) | NOT NULL |
+| stock_quantity | INT | |
+| image_url | VARCHAR(255) | |
+
+---
+
+## Setup Instructions
+
+### Prerequisites
+- Java Development Kit (JDK) 21
+- MySQL (XAMPP or standalone)
+- Maven
+- VS Code or IntelliJ IDEA
+
+### How to Run
+
+1. **Clone the Repository:**
+```bash
+git clone https://github.com/[YOUR_USERNAME]/[YOUR_REPOSITORY_NAME].git
